@@ -1,0 +1,103 @@
+{% load static %}
+<nav style="background-color: #47cfc6;" class="shadow-md">
+    <div class="container mx-auto px-4">
+        <div class="flex items-center justify-between h-15">
+            <div class="flex-shrink-0">
+                <a href="{% url 'home' %}" class="flex items-center space-x-2 text-white text-xl font-bold">
+    <img src="{% static 'images/logo.png' %}" alt="Logo" class="h-15 w-auto">
+    
+</a>
+
+    </div>
+ 
+            
+            <div class="hidden md:flex items-center space-x-4">
+                
+                
+                <button id="headerDarkModeIcon" class="text-gray-200 hover:text-white text-2xl focus:outline-none" aria-label="Alternar Modo Escuro/Claro">
+                    <i class="fas fa-moon"></i> 
+                </button>
+ 
+                {# Links de Navegação Desktop #}
+                
+                {% if user.is_authenticated %}
+                    {% if can_add_aula_permission %}
+                        
+                        <a href="{% url 'add_aula' %}" class="p-4 rounded-lg  font-bold text-xl">Cadastrar Aula</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class=" p-4 rounded-lg  font-bold text-xl">Logout</a>
+                {% else %}
+                    
+                    
+                    <a href="{% url 'home' %}" class="p-4 rounded-lg  font-bold text-xl">Login</a>
+                {% endif %}
+            </div>
+ 
+            
+            <div class="md:hidden flex items-center">
+                <button id="headerDarkModeIconMobile" class="text-gray-200 hover:text-white text-xl focus:outline-none mr-2 sm:mr-3" aria-label="Alternar Modo Escuro/Claro">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button id="mobile-menu-button" class="text-gray-200 hover:text-white focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white p-2 rounded-md" aria-controls="mobile-menu" aria-expanded="false">
+                    <span class="sr-only">Abrir menu principal</span>
+                    <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+ 
+  
+    <div id="mobile-menu" class="md:hidden hidden bg-blue-600 dark:bg-blue-700">
+        <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+           
+            {% if user.is_authenticated %}
+             {% if can_add_aula_permission %}
+                    <a href="{% url 'add_aula' %}" class="text-gray-200 hover:text-white block px-3 py-2 rounded-md text-base font-medium">Cadastrar Aula</a>
+             {% endif %}
+                {# ... #}
+            {% endif %}
+        </div>
+    </div>
+</nav>
+ 
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+    
+        if (mobileMenuButton && mobileMenu) {
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true' || false;
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+            });
+        }
+
+        const mobileThemeToggleBtn = document.getElementById('headerDarkModeIconMobile');
+        
+        // A função global `toggleTheme` é definida em base.html
+        if (mobileThemeToggleBtn && typeof toggleTheme === 'function') {
+            mobileThemeToggleBtn.addEventListener('click', () => {
+                toggleTheme(); 
+            });
+        }
+
+        const siteBodyInitial = document.body;
+        const mobileThemeBtnInitial = document.getElementById('headerDarkModeIconMobile');
+        if (mobileThemeBtnInitial) {
+            const iconMobile = mobileThemeBtnInitial.querySelector('i');
+            if (iconMobile) {
+                if (siteBodyInitial.classList.contains('dark-mode')) {
+                    iconMobile.classList.remove('fa-moon');
+                    iconMobile.classList.add('fa-sun');
+                } else {
+                    iconMobile.classList.remove('fa-sun');
+                    iconMobile.classList.add('fa-moon');
+                }
+            }
+        }
+    });
+</script>

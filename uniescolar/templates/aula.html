@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalhes da Aula: {{ aula.disciplina }} - Universo Escolar{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    
+    <div class="max-w-2xl mx-auto bg-white dark:bg-gray-800 shadow-xl rounded-lg overflow-hidden">
+        <div class="px-6 py-8">
+            
+            <h2 class="text-3xl font-bold text-content mb-2 text-center">Aula: {{ aula.disciplina }}</h2>
+            <p class="text-center text-muted mb-6">Detalhes da aula agendada</p>
+            
+            <div class="space-y-4">
+                <div>
+                    <h5 class="text-sm font-semibold text-label uppercase">Disciplina:</h5>
+                    <p class="text-content text-lg">{{ aula.disciplina }}</p>
+                </div>
+                <hr class="dark:border-gray-700">
+
+                <div>
+                    <h5 class="text-sm font-semibold text-label uppercase">Descrição:</h5>
+                    <p class="text-content text-lg">{{ aula.descricao|linebreaksbr }}</p>
+                </div>
+                <hr class="dark:border-gray-700">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Data:</h5>
+                        <p class="text-content text-lg">{{ aula.data_inicio|date:"d/m/Y" }}</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Horário:</h5>
+                        <p class="text-content text-lg">{{ aula.hora_inicio|time:"H:i" }} - {{ aula.hora_fim|time:"H:i" }}</p>
+                    </div>
+                </div>
+                <hr class="dark:border-gray-700">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Aluno:</h5>
+                        <p class="text-content text-lg">{{ aula.aluno }}</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Professor:</h5>
+                        <p class="text-content text-lg">{{ aula.professor }}</p>
+                    </div>
+                </div>
+                <hr class="dark:border-gray-700">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Local:</h5>
+                        <p class="text-content text-lg">{{ aula.local }}</p>
+                    </div>
+                    <div>
+                        <h5 class="text-sm font-semibold text-label uppercase">Status:</h5>
+                        <p class="text-content text-lg">{{ aula.get_status_aprovacao_display }}</p>
+                    </div>
+                </div>
+
+                 {% if aula.duracao_calculada %}
+                <hr class="dark:border-gray-700">
+                <div>
+                    <h5 class="text-sm font-semibold text-label uppercase">Duração Calculada:</h5>
+                    <p class="text-content text-lg">{{ aula.duracao_calculada|floatformat:2 }} horas</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        
+        <div class="bg-gray-50 dark:bg-gray-700 px-6 py-4 flex flex-col sm:flex-row justify-end items-center space-y-2 sm:space-y-0 sm:space-x-3">
+            
+            <a href="{% url 'home' %}" 
+               class="btn-secondary-custom text-center w-full sm:w-auto px-4 py-2 rounded-md font-medium flex items-center justify-center">
+               <i class="fas fa-arrow-left mr-2"></i>Voltar para Lista
+            </a>
+            
+           
+
+        </div>
+    </div>
+</div>
+{% endblock %}

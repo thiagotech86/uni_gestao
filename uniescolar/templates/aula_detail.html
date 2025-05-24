@@ -1,0 +1,43 @@
+{%extends 'base.html' %}
+
+{%block content%}
+
+    <h1 class="text-center" style="font-size: 22px"></h1>
+    <hr>
+
+
+    <div class="col-md-8 offset-md-2" >
+        <div class="card">
+            <div class="card-header text-left" >
+            <div class="card mt-4" style="background-color: #07ee1254">
+            <div class="card-header text-center" style="font-size: 22px" >
+                <b>Relatório</b>
+            </div>
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item"><b>Data:</b> {{aula_detail.data_inicio}}</li>
+                <li class="list-group-item"><b>Período:</b> {{aula_detail.hora_inicio}} às {{aula_detail.hora_fim}} </li>
+                <li class="list-group-item"><b>Aluno(a)</b>: {{aula_detail.aluno}}</li>
+                <li class="list-group-item"><b>Professor(a)</b>: {{aula_detail.professor}}</li>
+                <li class="list-group-item"><b>Disciplina</b>: {{aula_detail.disciplina}}</li>
+               
+            </ul>
+        </div>
+
+            </div>
+            <hr>
+            <div class="card-body text-justify" >
+                <p class="border-secondary" style="border: 1px solid rgba(94, 94, 94, 0.89); padding: 10px"><b>Desenvolvimento da aula:</b> {{aula_detail.descricao}}</p><br>
+                <div></div>
+                <hr>
+                
+
+            </div>
+
+        </div>
+        <div>
+        <a href="{%url 'home'%}" class="btn btn-secondary">Voltar</a>
+
+        </div>
+    </div>
+   
+{%endblock%}

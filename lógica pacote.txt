@@ -1,0 +1,18 @@
+class Lesson(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_package = models.ForeignKey(UserPackage, on_delete=models.CASCADE)
+    duration = models.DecimalField(max_digits=4, decimal_places=2)  # Ex: 1.5 horas
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def save(self, *args, **kwargs):
+        if self.duration > self.user_package.hours_remaining:
+            raise ValueError("Horas insuficientes no pacote!")
+
+        # Desconta as horas
+        self.user_package.hours_remaining -= self.duration
+        self.user_package.save()
+
+        super().save(*args, **kwargs)  # Salva a aula depois de atualizar o pacote
+
+    def __str__(self):
+        return f"{self.user.username} - {self.duration}h em {self.created_at.strftime('%d/%m/%Y')}"

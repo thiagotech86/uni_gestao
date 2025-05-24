@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ page_title|default:"Editar Aula" }} - Universo Escolar{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-xl mx-auto">
+        
+        <div class="form-card shadow-xl rounded-lg px-8 py-10 dark:bg-gray-800"> 
+            <h2 class="text-2xl font-semibold text-content dark:text-gray-50 mb-6 text-center">{{ page_title|default:"Editar Aula" }}</h2>
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="mb-4 p-3 rounded-md 
+                        {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-200
+                        {% elif message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700 dark:bg-green-900 dark:border-green-700 dark:text-green-200
+                        {% else %}bg-blue-100 border border-blue-400 text-blue-700 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200
+                        {% endif %}" role="alert">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <form method="post" action="{% url 'update_aula' aula.id %}"> 
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-5">
+                        <label for="{{ field.id_for_label }}" class="block text-label dark:text-gray-300 text-sm font-bold mb-2">
+                            {{ field.label }}
+                        </label>
+                        
+                        {% if field.name == 'professor' and not is_gestor %}
+                             {{ field.as_hidden }} 
+                             {% if aula.professor %}
+                                <p class="form-input-custom bg-gray-100 dark:bg-gray-600 cursor-not-allowed p-3 rounded-md">Professor: {{ aula.professor }}</p>
+                             {% endif %}
+                        {% else %}
+                            {{ field }} 
+                        {% endif %}
+                        
+                        {% if field.help_text %}
+                            <p class="text-xs text-muted dark:text-gray-400 mt-1">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                        
+                        {% for error in field.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                
+                <div class="mt-8 flex flex-col space-y-4 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between">
+                    
+
+                    
+                    
+    <div class="w-full flex justify-center sm:justify-center mt-4">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:space-x-4 space-y-2 sm:space-y-0">
+        {% if is_gestor %}
+            <a href="{% url 'home' %}" class="btn-secondary-custom text-center w-full sm:w-auto px-1 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity duration-150 inline-flex items-center justify-center whitespace-nowrap">
+                <i class="fas fa-times mr-2"></i>Cancelar
+            </a>
+            <button type="submit" name="salvar_pendente"
+                class="btn-primary-custom text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline hover:opacity-90 transition-opacity duration-150">
+                <i class="fas fa-save mr-2"></i>Salvar (Pendente)
+            </button>
+            <button type="submit" name="salvar_e_aprovar"
+                class="btn-success-custom text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline hover:opacity-90 transition-opacity duration-150">
+                <i class="fas fa-check-circle mr-2"></i>Aprovar
+            </button>
+
+        {% else %}
+            <button type="submit" name="salvar_edicao_professor"
+                class="btn-primary-custom text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:shadow-outline hover:opacity-90 transition-opacity duration-150">
+                <i class="fas fa-save mr-2"></i>Salvar Alterações
+            </button>
+        {% endif %}
+    </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const formElements = document.querySelectorAll(
+        '.form-card form input[type="text"], ' +
+        '.form-card form input[type="password"], ' +
+        '.form-card form input[type="email"], ' +
+        '.form-card form input[type="number"], ' +
+        '.form-card form input[type="date"], ' +
+        '.form-card form input[type="time"], ' +
+        '.form-card form select, ' +
+        '.form-card form textarea'
+    );
+    formElements.forEach(function(element) {
+        if (!element.classList.contains('form-input-custom')) { 
+            const baseClasses = [
+                'shadow-sm', 'appearance-none', 'border', 'rounded', 'w-full', 'py-3', 'px-4', 
+                'leading-tight', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500',
+                'focus:border-transparent', 'transition', 'duration-150', 'ease-in-out'
+            ];
+            const lightModeClasses = [
+                'text-black', 'placeholder-gray-600', 'bg-white', 'border-gray-300'
+            ];
+            const darkModeClasses = [
+                'dark:bg-gray-700', 'dark:text-white', 'dark:placeholder-gray-400', 'dark:border-gray-600'
+            ];
+            if (element.tagName.toLowerCase() === 'select' || (element.type !== 'checkbox' && element.type !== 'radio')) {
+                element.classList.add(...baseClasses, ...lightModeClasses, ...darkModeClasses);
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

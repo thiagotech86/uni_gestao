@@ -1,0 +1,501 @@
+{% extends 'base.html' %}
+{% load static %} 
+{% load time_filters %} 
+
+{% block title %}Página Inicial - Universo Escolar{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+
+    {% if user.is_authenticated %}
+
+        
+        <div class="flex flex-col sm:flex-row justify-around items-center text-center mb-4 p-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow">
+            
+            {% if user_is_professor %}
+                
+                <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                    Total <br>Horas-Aula <br>
+                    <span class="text-blue-600 dark:text-blue-400 text-2xl">{{ total_horas_aulas_filtradas|format_hours_minutes }}</span>
+                </h4>
+                
+                
+            {% elif user_is_responsavel_profile %} 
+                
+                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 sm:mb-0">
+                    Horas Contratadas: <span class="text-blue-600 dark:text-blue-400">{{ horas_contratadas_aluno_filtrado|format_hours_minutes  }}</span>
+                </h4>
+
+                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 sm:mb-0">
+                    Horas Utilizadas: <span class="text-orange-500 dark:text-orange-400">{{ horas_utilizadas_aluno_filtrado|format_hours_minutes }}</span>
+                </h4>
+                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200">
+                    Saldo de Horas: 
+                    <span id="saldoHorasResponsavel" 
+                            class="font-bold {% if saldo_horas_responsavel < 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">
+                            {{ saldo_horas_aluno_filtrado|format_hours_minutes }}
+                    </span>
+                </h4>
+            
+            {% elif user_is_gestor %}
+                <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                    Total <br>horas-aula<br>(filtro)<br>
+                    <span class="text-blue-600 dark:text-blue-400 text-2xl">{{ total_horas_aulas_filtradas|format_hours_minutes }}</span>
+                </h4>
+                    <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                        Aulas<br> Contratadas<br>(cliente) <br> <span class="text-blue-600 dark:text-blue-400 text-2xl">{{ horas_contratadas_aluno_filtrado|format_hours_minutes  }}</span>
+                    </h4>
+
+                    <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                        Horas<br> Utilizadas<br>(Cliente)<br> <span class="text-blue-600 dark:text-orange-400 text-2xl">{{ horas_utilizadas_aluno_filtrado|format_hours_minutes }}</span>
+                    </h4>
+                    <h4 class="p-4 rounded-lg shadow font-bold text-xl
+                    {% if saldo_horas_aluno_filtrado <= 0 %}
+                        bg-red-500 dark:bg-red-800
+                    {% elif saldo_horas_aluno_filtrado <= 10 %}
+                        bg-yellow-200 dark:bg-yellow-800
+                    {% else %}
+                        bg-green-200 dark:bg-green-800
+                    {% endif %}
+                    ">
+                    Saldo<br> Horas-Aula <br>(Cliente)<br>
+                    <span class="text-stone-900 dark:text-stone-400">
+                        {{ saldo_horas_aluno_filtrado|format_hours_minutes }}
+                    </span>
+                    </h4>
+            {%else%}
+            
+                    <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                        Aulas <br> Contratadas <br> {{ total_contratado_responsavel|format_hours_minutes  }}
+                    </h4>
+
+                    <h4 class="p-4 rounded-lg shadow bg-green-300 dark:bg-red-500 text-black font-bold text-xl mt-0">
+                        Aulas <br> Realizadas <br> {{ total_utilizado_responsavel|format_hours_minutes }}
+                    </h4>
+                    <h4 class="p-4 rounded-lg shadow font-bold text-xl
+                    {% if saldo_horas_responsavel <= 0 %}
+                        bg-red-500 dark:bg-red-800
+                    
+                    {% elif saldo_horas_responsavel <= 10 %}
+                        bg-yellow-200 dark:bg-yellow-800
+                    {% else %}
+                        font-bold bg-blue-400 dark:bg-blue-800
+                    {% endif %}
+                    ">
+                     {% if saldo_horas_responsavel < 0 %}
+                    <span class="font-bold text-xl text-stone-900 dark:text-red-200">Solicite <br> um pacote</span>
+                    {% else %}
+                        Saldo<br> Horas-Aula <br> 
+                        <span class="font-semibold text-stone-900 dark:text-stone-500">
+                         {{ saldo_horas_responsavel|format_hours_minutes }}
+                        </span>
+                    {% endif %}
+                        </h4>
+                    {% endif %}
+        </div>
+
+        
+        {% if aulas %}
+        <form method="GET" action="{% url 'home' %}" class="mt-0">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow" style="padding: 0%";>
+            <div>
+                <label for="data_de" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-0">Data de:</label>
+                <input type="date" id="data_de" name="data_de" value="{{ selected_data_de }}" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+            <div>
+                <label for="data_ate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-0">Até:</label>
+                <input type="date" id="data_ate" name="data_ate" value="{{ selected_data_ate }}" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            </div>
+
+            {% if user_is_gestor or user_is_responsavel_profile %} 
+            <div>
+                <label for="professor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-0">Professor:</label>
+                <select id="professor" name="professor" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todos os professores</option>
+                    {% for professor in todos_professores %}
+                        <option value="{{ professor.pk }}" {% if professor.pk|stringformat:"s" == selected_professor %}selected{% endif %}>
+                            {{ professor.user.get_full_name|default:professor.user.username }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+            </div>
+            {% endif %}
+            {% if user_is_gestor or user_is_professor %} 
+            <div>
+                <label for="aluno"  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno:</label>
+                <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                    <option value="">Todos os alunos</option>
+                    {% for aluno in todos_alunos %}
+                        <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
+                            {{ aluno.nome }}
+                        </option>
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+            {% endif %}
+
+        </div>
+        <div class="text-center mt-2">
+            <!-- Botão de Filtrar -->
+            <button type="submit" class="btn btn-primary me-2">Filtrar Aulas</button>
+
+            <!-- Link de Limpar Filtros -->
+            <a href="{% url 'home' %}" class="btn btn-secondary">Limpar Filtros</a>
+        </div>
+        </form>
+        {% endif %}
+
+        <hr class="border-t border-gray-300 dark:border-gray-600 my-2">
+
+        
+        <div class="overflow-x-auto bg-white dark:bg-gray-800 shadow-xl rounded-lg">
+            <table id="tabelaAulas" class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead class="bg-gray-200 dark:bg-gray-700"> 
+                    <tr>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Disciplina</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Data</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Início</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Término</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Aluno</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Professor</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Duração</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Status</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Ações</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    {% if aulas %}
+                        {% for aula_item in aulas %}
+                        <tr class="
+                            {% if aula_item.status_aprovacao == 'pendente' %}bg-orange-300 text-orange-950 dark:bg-orange-600/70 dark:text-orange-100
+                            {% elif aula_item.status_aprovacao == 'aprovada' %}bg-green-300 text-green-950 dark:bg-green-600/60 dark:text-green-100
+                            {% elif aula_item.status_aprovacao == 'rejeitada' %}bg-red-300 text-red-950 dark:bg-red-600/70 dark:text-red-100 opacity-90
+                            {% else %}text-gray-800 dark:text-gray-200    
+                            {% endif %} hover:bg-gray-100 dark:hover:bg-gray-700/80 transition-colors duration-150">
+                            
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %}">{{ aula_item.disciplina.nome }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %} filtro-data" data-date="{{ aula_item.data_inicio|date:'Y-m-d' }}">{{ aula_item.data_inicio|date:"d/m/Y" }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %} hora-inicio">{{ aula_item.hora_inicio|time:"H:i" }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %} hora-fim">{{ aula_item.hora_fim|time:"H:i" }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %}">{{ aula_item.aluno.nome }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %}">{{ aula_item.professor.user.username }}</td>
+                            <td class="px-0 py-2 text-center align-middle whitespace-nowrap text-sm {% if aula_item.status_aprovacao %}current-color{% else %}text-inherit{% endif %} duracao" data-decimal-value="{{ aula_item.duracao_calculada }}">
+                                {{ aula_item.duracao_calculada|format_hours_minutes }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-center align-middle
+                                {% if aula_item.status_aprovacao == 'aprovada' %}text-green-700 dark:text-green-300
+                                {% elif aula_item.status_aprovacao == 'pendente' %}text-orange-700 dark:text-orange-300
+                                {% elif aula_item.status_aprovacao == 'rejeitada' %}text-red-700 dark:text-red-300
+                                {% else %}current-color
+                                {% endif %}">
+                                {{ aula_item.get_status_aprovacao_display }}
+                            </td>
+                            
+                            <td class="px-2 py-4 whitespace-nowrap text-sm">
+                                <div class="flex items-center justify-center space-x-2"> {# justify-center para centralizar os botões #}
+                                    
+                                    <a href="{% url 'detalhe_aula' aula_item.id %}" 
+                                       class="btn-info-custom text-white font-semibold py-1.5 px-3 rounded-md shadow-sm hover:shadow-md transition-all duration-150 ease-in-out inline-flex items-center text-xs" title="Relatório">
+                                        <i class="fas fa-file-alt mr-1 sm:mr-2"></i><span class="hidden sm:inline">Relatório</span>
+                                    </a>
+
+                                    
+                                    {% if user_is_gestor or user_is_professor and user.professor_profile == aula_item.professor and aula_item.status_aprovacao == 'pendente' %}
+                                    <a href="{% url 'update_aula' aula_item.id %}" 
+                                       class="btn-primary-custom text-white font-semibold py-1.5 px-1 rounded-md shadow-sm hover:shadow-md transition-all duration-150 ease-in-out inline-flex items-center text-xs" title="Editar">
+                                        <i class="fas fa-edit mr-1 sm:mr-2"></i><span class="hidden sm:inline">Editar</span>
+                                    </a>
+                                    {% endif %}
+
+                                    
+                                    {% if user_is_gestor and aula_item.status_aprovacao == 'pendente' %}
+                                        <form action="{% url 'aprovar_aula' aula_item.id %}" method="POST" class="inline">
+                                            {% csrf_token %}
+                                            <button type="submit" class="btn-success-custom text-white font-semibold py-1.5 px-1 rounded-md shadow-sm hover:shadow-md transition-all duration-150 inline-flex items-center text-xs" title="Aprovar">
+                                                <i class="fas fa-check mr-1 sm:mr-2"></i><span class="hidden sm:inline">Aprovar</span>
+                                            </button>
+                                        </form>
+
+                                    {% endif %}
+                                    
+                                    {% if user_is_gestor or user_is_professor and user.professor_profile == aula_item.professor and aula_item.status_aprovacao == 'pendente' %}
+                                    <form action="{% url 'delete_aula' aula_item.id %}" method="POST" class="inline-block" onsubmit="return confirm('Tem certeza que deseja excluir esta aula?');">
+                                        {% csrf_token %}
+                                        <button type="submit" 
+                                                class="btn-danger-custom text-white font-semibold py-1.5 px-1 rounded-md shadow-sm hover:shadow-md transition-all duration-150 ease-in-out inline-flex items-center text-xs" title="Excluir">
+                                            <i class="fas fa-trash mr-1"></i><span class="hidden sm:inline">Excluir</span>
+                                        </button>
+                                    </form>
+                                    {% elif not user_is_gestor and aula_item.status_aprovacao != 'pendente' and user.professor_profile == aula_item.professor %}
+                                        
+                                    {% elif not user_is_gestor and user.professor_profile != aula_item.professor and not user_is_responsavel_profile %}
+                                         
+                                    {% endif %}
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 text-center">Nenhuma aula encontrada.</td>
+                        </div>
+                        <div class="d-flex justify-content-center" style="margin: 0%;">
+                        <a href="{% url 'home' %}" class="btn btn-secondary">Limpar Filtros</a>
+                        </div>
+                        </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        {{ horas_contratadas_por_aluno_json|json_script:"dadosContratadosPorAluno" }}
+        {{ total_contratado_todos_alunos_json|json_script:"dadosTotalContratado" }}
+
+    {% else %}
+        
+        <div class="flex justify-center items-center py-8 min-h-[calc(100vh-200px)]">
+            <div class="w-full max-w-md">
+                {% if messages %}
+                    <div class="mb-4">
+                        {% for message in messages %}
+                            <div class="p-4 rounded-md 
+                                {% if message.tags == 'error' %}bg-red-100 border border-red-400 text-red-700 dark:bg-red-900 dark:border-red-700 dark:text-red-200
+                                {% elif message.tags == 'success' %}bg-green-100 border border-green-400 text-green-700 dark:bg-green-900 dark:border-green-700 dark:text-green-200
+                                {% else %}bg-blue-100 border border-blue-400 text-blue-700 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200
+                                {% endif %}" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                <div class="form-card px-6 py-8 dark:bg-gray-800 rounded-lg shadow-xl"> 
+                    <h2 class="text-3xl font-bold text-center text-black dark:text-white mb-2">Bem-vindos!</h2>
+                    <p class="text-center text-gray-600 dark:text-gray-400 mb-8">Faça login para continuar</p>
+                    <form method="post" action="{% url 'home' %}"> 
+                        {% csrf_token %}
+                        <div class="mb-5">
+                            <label for="username-home" class="block text-black dark:text-gray-300 text-sm font-bold mb-2">Usuário:</label>
+                            <input type="text" id="username-home" name="username" placeholder="Insira o usuário" class="shadow-sm appearance-none border border-gray-300 rounded w-full py-3 px-3 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600 dark:placeholder-gray-400" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="password-home" class="block text-black dark:text-gray-300 text-sm font-bold mb-2">Senha:</label>
+                            <input type="password" id="password-home" name="password" placeholder="Insira a senha" class="shadow-sm appearance-none border border-gray-300 rounded w-full py-3 px-3 bg-white text-black placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600 dark:placeholder-gray-400" required>
+                        </div>
+                        <div class="mb-6">
+                            <label for="userType-home" class="block text-black dark:text-gray-300 text-sm font-bold mb-2">Perfil de usuário:</label>
+                            <select id="userType-home" name="user_type" class="shadow-sm appearance-none border border-gray-300 rounded w-full py-3 px-3 bg-white text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition duration-150 ease-in-out leading-tight dark:bg-gray-700 dark:text-gray-50 dark:border-gray-600">
+                                <option value="aluno_responsavel" class="text-black bg-white dark:text-gray-200 dark:bg-gray-600">Responsável</option>
+                                <option value="professor" class="text-black bg-white dark:text-gray-200 dark:bg-gray-600">Professor</option>
+                                <option value="gestor" class="text-black bg-white dark:text-gray-200 dark:bg-gray-600">Gestor</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-center mt-8">
+                            <button type="submit" class="btn-primary-custom w-full py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline hover:opacity-90 transition-opacity duration-150">Entrar</button>
+                        </div>
+                         <!--<p class="text-center text-gray-600 dark:text-gray-400 mt-6 text-sm">Não tem uma conta? <a href="{% url 'register' %}" class="font-medium text-blue-600 dark:text-blue-400 hover:underline">Cadastre-se</a></p>-->
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+{% if user.is_authenticated and aulas %}
+<style>
+    /* Estilos adicionais para botões de ação se as classes customizadas não estiverem no base.html */
+    .btn-info-custom {
+        background-color: #0dcaf0; /* Cor info do Bootstrap (azul claro) */
+        color: white;
+    }
+    .btn-info-custom:hover {
+        background-color: #0baccc;
+    }
+    .btn-warning-custom { /* Para o botão Rejeitar */
+        background-color: #ffc107; /* Cor warning do Bootstrap (amarelo/laranja) */
+        color: #212529; /* Texto escuro para contraste */
+    }
+    .btn-warning-custom:hover {
+        background-color: #e0a800;
+    }
+
+    /* Dark mode para os novos botões, se necessário */
+    body.dark-mode .btn-info-custom {
+        background-color: #3dd5f3;
+        color: #111827;
+    }
+    body.dark-mode .btn-info-custom:hover {
+        background-color: #25c4e0;
+    }
+    body.dark-mode .btn-warning-custom {
+        background-color: #ffca2c;
+        color: #212529;
+    }
+    body.dark-mode .btn-warning-custom:hover {
+        background-color: #ffc107;
+    }
+</style>
+
+<script>
+    const CSRF_TOKEN = "{{ csrf_token }}"; 
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const dataInicioEl = document.getElementById("dataInicio");
+    const dataFimEl = document.getElementById("dataFim");
+    const filtroProfessorEl = document.getElementById("filtroProfessor");
+    const filtroAlunoEl = document.getElementById("filtroAluno"); 
+    const tabelaAulasBody = document.querySelector("#tabelaAulas tbody");
+
+    let horasContratadasPorAluno = {};
+    try {
+        const dadosContratadosElement = document.getElementById("dadosContratadosPorAluno");
+        if (dadosContratadosElement) {
+            horasContratadasPorAluno = JSON.parse(dadosContratadosElement.textContent);
+        }
+    } catch (e) { 
+        console.error("Erro JS: Falha ao parsear dadosContratadosPorAluno", e); 
+    }
+    
+    function formatDecimalHoursToXHMY(decimalHours) {
+        const numDecimalHours = parseFloat(decimalHours);
+        if (isNaN(numDecimalHours)) { return "0h00"; }
+        const sign = numDecimalHours < 0 ? "-" : ""; 
+        const absDecimalHours = Math.abs(numDecimalHours);
+        const hours = Math.floor(absDecimalHours);
+        let minutes = Math.round((absDecimalHours - hours) * 60);
+        let adjustedHours = hours;
+        if (minutes === 60) { 
+            adjustedHours += 1; 
+            minutes = 0; 
+        }
+        const paddedMinutes = minutes < 10 ? '0' + minutes : minutes.toString();
+        return `${sign}${adjustedHours}h${paddedMinutes}`;
+    }
+
+    function popularFiltros() {
+        const professores = new Set();
+        const alunos = new Set();
+        if (tabelaAulasBody) { 
+            document.querySelectorAll("#tabelaAulas tbody tr").forEach(row => {
+                if (row.children.length > 1 && !row.querySelector("td[colspan]")) { 
+                    const alunoNome = row.cells[4]?.textContent.trim(); 
+                    const profNome = row.cells[5]?.textContent.trim();  
+                    if (alunoNome) alunos.add(alunoNome);
+                    if (profNome) professores.add(profNome);
+                }
+            });
+        }
+
+        if (filtroProfessorEl) {
+            const selectedProf = filtroProfessorEl.value; 
+            while (filtroProfessorEl.options.length > 1) filtroProfessorEl.remove(1);
+            professores.forEach(nome => { if(nome){ const opt = document.createElement("option"); opt.value = nome; opt.textContent = nome; filtroProfessorEl.appendChild(opt); }});
+            if (Array.from(filtroProfessorEl.options).some(opt => opt.value === selectedProf)) { 
+                filtroProfessorEl.value = selectedProf; 
+            }
+        }
+        if (filtroAlunoEl) {
+            const selectedAluno = filtroAlunoEl.value; 
+            while (filtroAlunoEl.options.length > 1) filtroAlunoEl.remove(1);
+            alunos.forEach(nome => { if(nome){ const opt = document.createElement("option"); opt.value = nome; opt.textContent = nome; filtroAlunoEl.appendChild(opt); }});
+            if (Array.from(filtroAlunoEl.options).some(opt => opt.value === selectedAluno)) { 
+                filtroAlunoEl.value = selectedAluno; 
+            }
+        }
+    }
+
+    function aplicarFiltro() {
+        if (!tabelaAulasBody) { 
+            return; 
+        }
+        const inicioVal = dataInicioEl ? dataInicioEl.value : null;
+        const fimVal = dataFimEl ? dataFimEl.value : null;
+        const profVal = filtroProfessorEl ? filtroProfessorEl.value.toLowerCase() : "";
+        const alunoVal = filtroAlunoEl ? filtroAlunoEl.value.toLowerCase() : "";
+        let algumaLinhaVisivel = false;
+
+        const nenhumaAulaRowExistente = tabelaAulasBody.querySelector("tr td[colspan]"); 
+        if (nenhumaAulaRowExistente) {
+            nenhumaAulaRowExistente.parentElement.style.display = "none"; 
+        }
+
+        document.querySelectorAll("#tabelaAulas tbody tr").forEach(row => {
+            if (row.children.length === 1 && row.children[0].getAttribute('colspan')) return;
+            const dataCell = row.cells[1]; 
+            let dataRowVal = dataCell?.querySelector(".filtro-data")?.getAttribute("data-date");
+            if (!dataRowVal) { 
+                 dataRowVal = dataCell?.textContent.trim();
+                 
+                 if (dataRowVal && dataRowVal.includes('/')) {
+                    const parts = dataRowVal.split('/');
+                    if (parts.length === 3) {
+                        dataRowVal = `${parts[2]}-${parts[1]}-${parts[0]}`;
+                    }
+                 }
+            }
+            const profRowVal = row.cells[5]?.textContent.toLowerCase();  
+            const alunoRowVal = row.cells[4]?.textContent.toLowerCase(); 
+            
+            let visivel = true;
+            if (inicioVal && dataRowVal < inicioVal) visivel = false;
+            if (fimVal && dataRowVal > fimVal) visivel = false;
+            if (profVal && profRowVal !== profVal) visivel = false; 
+            if (alunoVal && alunoRowVal !== alunoVal) visivel = false; 
+            
+            row.style.display = visivel ? "" : "none"; 
+            if (visivel) {
+                algumaLinhaVisivel = true;
+            }
+        });
+        
+        const saldoHorasResponsavelSpan = document.getElementById("saldoHorasResponsavel");
+        if (saldoHorasResponsavelSpan && {{ user_is_responsavel_profile|yesno:"true,false" }}) { 
+            
+        }
+        
+        const nenhumaAulaRow = tabelaAulasBody.querySelector("tr td[colspan]"); 
+        if (!algumaLinhaVisivel) {
+            if (!nenhumaAulaRow) { 
+                const tr = document.createElement('tr'); 
+                const td = document.createElement('td');
+                td.setAttribute('colspan', '9'); 
+                td.className = 'px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 text-center';
+                td.textContent = 'Nenhuma aula disponível para os filtros selecionados.';
+                tr.appendChild(td); 
+                if (tabelaAulasBody) tabelaAulasBody.appendChild(tr);
+            } else { 
+                nenhumaAulaRow.parentElement.style.display = ""; 
+                nenhumaAulaRow.setAttribute('colspan', '9'); 
+            }
+        } else { 
+            if (nenhumaAulaRow) nenhumaAulaRow.parentElement.style.display = "none"; 
+        }
+    }
+
+    if (dataInicioEl) dataInicioEl.addEventListener("change", aplicarFiltro);
+    if (dataFimEl) dataFimEl.addEventListener("change", aplicarFiltro);
+    if (filtroProfessorEl) filtroProfessorEl.addEventListener("input", aplicarFiltro);
+    if (filtroAlunoEl) filtroAlunoEl.addEventListener("input", aplicarFiltro);
+
+    if (tabelaAulasBody) { 
+        const hasDataRows = Array.from(tabelaAulasBody.querySelectorAll("tr")).some(
+            row => row.children.length > 1 && !row.querySelector("td[colspan]") 
+        );
+        if (hasDataRows) {
+            popularFiltros(); 
+        }
+    }
+    aplicarFiltro(); 
+});
+ </script>
+{% verbatim %} 
+</script>
+{% endverbatim %}
+{% endif %}
+
+{% endblock %}

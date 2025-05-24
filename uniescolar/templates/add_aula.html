@@ -1,0 +1,15 @@
+{%extends 'base.html'%}
+
+{%block content%}
+    <div class="col-md-6 offset-md-3">
+        <h2 class="text-center">Cadastrar Aula</h2>
+        <hr>
+        <form method="post" action="{%url 'add_aula'%}" >
+            {%csrf_token%}
+            {{form.as_p}}
+            <br>
+            <button type="submit" class="btn btn-success">Adicionar</button>
+        </form>
+        
+    </div>
+{%endblock%}

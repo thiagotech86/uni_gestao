@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Cadastrar Nova Aula - Universo Escolar{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="max-w-xl mx-auto">
+        
+        <div class="form-card shadow-xl rounded-lg px-8 py-10"> 
+            <h2 class="text-2xl font-semibold text-content dark:text-gray-50 mb-6 text-center">Cadastrar Nova Aula</h2>
+            
+            <form method="post" action="{% url 'add_aula' %}">
+                {% csrf_token %}
+
+                {% for field in form %}
+                    <div class="mb-5">
+                        <label for="{{ field.id_for_label }}" class="block text-label dark:text-gray-300 text-sm font-bold mb-2">
+                            {{ field.label }}
+                        </label>
+                        
+                        {{ field }} 
+                        
+                        {% if field.help_text %}
+                            <p class="text-xs text-muted dark:text-gray-400 mt-1">{{ field.help_text|safe }}</p>
+                        {% endif %}
+                        
+                        {% for error in field.errors %}
+                            <p class="text-red-500 text-xs italic mt-1">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
+
+                <div class="mt-8 flex items-center justify-end space-x-3">
+                    <a href="{% url 'home' %}" class="btn-secondary-custom text-center px-6 py-3 rounded-lg font-medium hover:opacity-90 transition-opacity duration-150">
+                        Cancelar
+                    </a>
+                    <button type="submit"
+                            class="btn-success-custom text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:shadow-outline hover:opacity-90 transition-opacity duration-150">
+                        Adicionar Aula
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Este script adiciona classes Tailwind CSS aos elementos de formulário nesta página.
+
+document.addEventListener('DOMContentLoaded', function() {
+   
+    const formElements = document.querySelectorAll(
+        '.form-card form input[type="text"], ' +
+        '.form-card form input[type="password"], ' +
+        '.form-card form input[type="email"], ' +
+        '.form-card form input[type="number"], ' +
+        '.form-card form input[type="date"], ' +
+        '.form-card form input[type="time"], ' +
+        '.form-card form select, ' +
+        '.form-card form textarea'
+    );
+    
+    formElements.forEach(function(element) {
+        // Classes base de estrutura e foco (comuns para ambos os modos)
+        const baseClasses = [
+            'shadow-sm', 'appearance-none', 'border', 'rounded', 'w-full', 'py-3', 'px-4',
+            'leading-tight', 'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500',
+            'focus:border-transparent', 'transition', 'duration-150', 'ease-in-out'
+        ];
+
+        
+        const lightModeClasses = [
+            'text-black',             // Cor do texto digitado no modo claro (preto)
+            'placeholder-gray-600',   // Cor do placeholder no modo claro (cinza escuro)
+            'bg-white',               // Fundo do input no modo claro
+            'border-gray-300'         // Cor da borda no modo claro
+        ];
+
+       
+        const darkModeClasses = [
+            'dark:bg-gray-700',          // Fundo do input no modo escuro
+            'dark:text-white',           // Cor do texto digitado no modo escuro
+            'dark:placeholder-gray-400', // Cor do placeholder no modo escuro
+            'dark:border-gray-600'       // Cor da borda no modo escuro
+        ];
+
+        element.classList.add(...baseClasses, ...lightModeClasses, ...darkModeClasses);
+
+      
+        if (element.tagName.toLowerCase() === 'select') {
+           
+        }
+    });
+});
+</script>
+{% endblock %}
