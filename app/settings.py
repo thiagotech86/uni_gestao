@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
+import dj_database_url
 
 # teste
 
@@ -80,14 +81,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'uni_escolar',
-        'USER': 'postgres',  
-        'PASSWORD': '@Thi05Ma03',
-        'HOST': '127.0.0.1',
-        'PORT': '5432',
-    }
+'default': dj_database_url.config(default=os.environ['DATABASE_URL'], conn_max_age=600)
 }
 
 
@@ -153,3 +147,9 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DEBUG = os.getenv('DEBUG', 'False') == 'True'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'insecure-secret')
+
+ALLOWED_HOSTS = ['app.onrender.com']
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
