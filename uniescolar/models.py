@@ -152,7 +152,7 @@ class Aluno(models.Model):
 
 class PacoteHora(models.Model):
     id = models.AutoField(primary_key=True)
-    horas_contratadas = models.IntegerField()
+    horas_contratadas = models.FloatField()
     valor_hora = models.DecimalField(max_digits=8, decimal_places=2)
     data_contrato = models.DateField(default=timezone.now)
     responsavel = models.ForeignKey(
