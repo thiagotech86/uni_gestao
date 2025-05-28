@@ -94,21 +94,24 @@ class AddAulaForm(forms.ModelForm):
             'data_inicio', 'hora_inicio', 'hora_fim', 'descricao'
         ]
 
-    def clean(self):
-        cleaned_data = super().clean()
+def clean(self):
+    cleaned_data = super().clean()
+    aluno = cleaned_data.get('aluno')
+    professor = cleaned_data.get('professor')
+    data_inicio = cleaned_data.get('data_inicio')
+    hora_inicio = cleaned_data.get('hora_inicio')
+    hora_fim = cleaned_data.get('hora_fim')
 
-        data_inicio = cleaned_data.get("data_inicio")
-        hora_inicio = cleaned_data.get("hora_inicio")
-        hora_fim = cleaned_data.get("hora_fim")
+    if aluno and professor and data_inicio and hora_inicio and hora_fim:
+        if Aula.objects.filter(
+            aluno=aluno,
+            professor=professor,
+            data_inicio=data_inicio,
+            hora_inicio=hora_inicio,
+            hora_fim=hora_fim
+        ).exists():
+            raise forms.ValidationError(
+                "Já existe uma aula cadastrada com os mesmos dados: aluno, professor, data, hora de início e hora de fim."
+            )
 
-        # Validação dos campos obrigatórios
-        if not data_inicio:
-            self.add_error('data_inicio', "A data da aula é obrigatória.")
-        if not hora_inicio:
-            self.add_error('hora_inicio', "A hora de início é obrigatória.")
-        if not hora_fim:
-            self.add_error('hora_fim', "A hora de fim é obrigatória.")
-
-        # Validação de lógica: hora fim deve ser após hora início
-        if hora_inicio and hora_fim and hora_inicio >= hora_fim:
-            self.add_error('hora_fim', "A hora de fim deve ser após a hora de início.")
+    return cleaned_data

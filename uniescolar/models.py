@@ -191,7 +191,10 @@ class Aula(models.Model):
         choices=STATUS_APROVACAO_CHOICES,
         default='pendente' # Default para novas aulas
     )
-
+    class Meta:
+        unique_together = (
+            'aluno', 'professor', 'data_inicio', 'hora_inicio', 'hora_fim'
+        )
     def __str__(self):
         return f"Aula de {self.disciplina} para {self.aluno.nome} ({self.get_status_aprovacao_display()})"
 
