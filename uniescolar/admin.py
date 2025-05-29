@@ -39,3 +39,22 @@ admin.site.register(PacoteHora)
 admin.site.register(Usuario)
 admin.site.register(Gestor)
 admin.site.register(Aluno)
+
+
+class PacoteHoraAdmin(admin.ModelAdmin):
+    list_display = (
+        "responsavel",
+        "aluno",
+        "horas_contratadas",
+        "valor_hora",
+        "data_contrato",
+    )
+    list_filter = ("responsavel", "aluno")
+    autocomplete_fields = ("responsavel", "aluno")
+    
+    search_fields = (
+        "responsavel__user__first_name",
+        "responsavel__user__last_name",
+        "responsavel__user__username",
+        "aluno__nome",
+    )

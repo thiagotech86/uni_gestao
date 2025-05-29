@@ -107,7 +107,7 @@
                 <input type="date" id="data_ate" name="data_ate" value="{{ selected_data_ate }}" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
             </div>
 
-            {% if user_is_gestor or user_is_responsavel_profile %} 
+            {% if user_is_gestor %} 
             <div>
                 <label for="professor" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-0">Professor:</label>
                 <select id="professor" name="professor" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
@@ -121,23 +121,20 @@
                 </select>
             </div>
             {% endif %}
-            {% if user_is_gestor or user_is_professor %} 
-            <div>
-                <label for="aluno"  class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno:</label>
-                <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Todos os alunos</option>
-                    {% for aluno in todos_alunos %}
-                        <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
-                            {{ aluno.nome }}
-                        </option>
-                    {% endfor %}
-
-                </select>
-
-            </div>
-
-            {% endif %}
-
+           {% if user_is_gestor or user_is_professor or user_is_responsavel_profile %}
+    <div>
+        <label for="aluno" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno:</label>
+        <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Todos os alunos</option>
+            {% for aluno in todos_alunos %}
+                <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
+                    {{ aluno.nome }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+{% endif %}
+ 
         </div>
         <div class="text-center mt-2">
             <!-- Botão de Filtrar -->

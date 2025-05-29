@@ -3,6 +3,8 @@ from django.utils import timezone
 from django.contrib.auth.models import User
 from django.contrib import admin
 from datetime import datetime, date, time
+from django.core.exceptions import ValidationError
+from django.db.models import Sum 
 
 def hora_inicio_padrao():
     return time(8, 0)
@@ -108,13 +110,18 @@ class Aluno(models.Model):
         related_name="alunos_dependentes" # Permite responsavel.alunos_dependentes.all()
     )
 
-    def horas_contratadas(self):
-        if self.responsavel:
-            # Soma as horas de todos os pacotes associados ao responsável deste aluno.
-            # Se um pacote é para um responsável, ele se aplica a todos os seus dependentes.
-            total_horas = sum(pacote.horas_contratadas for pacote in self.responsavel.pacotes_hora.all())
-            return total_horas
-        return 0
+    def horas_contratadas(self) -> float:
+        """
+        Total de horas contratadas **exclusivamente** para este aluno
+        (pacotes individuais: PacoteHora.aluno == self).
+
+        Retorna 0 se não houver nenhum pacote.
+        """
+        return (
+            self.pacotes_hora_individuais
+                .aggregate(total=Sum('horas_contratadas'))
+                .get('total') or 0.0
+        )
 
     def horas_utilizadas(self):
         """
@@ -152,15 +159,39 @@ class Aluno(models.Model):
 
 class PacoteHora(models.Model):
     id = models.AutoField(primary_key=True)
+
+    # ► NOVO: um pacote pode (opcionalmente) pertencer a um único aluno
+    aluno = models.ForeignKey(
+        "Aluno",
+        on_delete=models.CASCADE,
+        null=True,            # permite pacotes “de família” (sem aluno)
+        blank=True,
+        related_name="pacotes_hora_individuais"
+    )
+
     horas_contratadas = models.FloatField()
     valor_hora = models.DecimalField(max_digits=8, decimal_places=2)
     data_contrato = models.DateField(default=timezone.now)
+
+    # Pacotes herdados mantêm o vínculo com o responsável
     responsavel = models.ForeignKey(
-        Responsavel, on_delete=models.CASCADE, related_name="pacotes_hora"
+        Responsavel,
+        on_delete=models.CASCADE,
+        related_name="pacotes_hora"
     )
 
     def __str__(self):
-        return f"{self.responsavel} - Data: {self.data_contrato} - {self.horas_contratadas} h "
+        aluno_nome = f" | Aluno: {self.aluno}" if self.aluno else ""
+        return (
+            f"{self.responsavel} - Data: {self.data_contrato} - "
+            f"{self.horas_contratadas} h{aluno_nome}"
+        )
+
+    # (opcional) garante que pelo menos um dos dois campos exista
+    def clean(self):
+        super().clean()
+        if not self.aluno and not self.responsavel:
+            raise ValidationError("Defina um responsável ou um aluno.")
 
 class Aula(models.Model):
     STATUS_APROVACAO_CHOICES = [
