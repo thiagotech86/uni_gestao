@@ -33,8 +33,13 @@ def home(request):
     user_is_gestor_profile = False
     user_is_professor_profile = False 
     user_is_responsavel_profile = False
+    alunos_responsavel = Aluno.objects.none() 
     lista_de_alunos_para_filtro = Aluno.objects.all().order_by('nome')
     lista_de_professores_para_filtro = Professor.objects.all().order_by('user__first_name', 'user__last_name')
+   
+
+
+
 
     if request.method == "POST": # Tentativa de Login
         username_from_form = request.POST.get('username')
@@ -104,9 +109,14 @@ def home(request):
         elif user_is_professor_profile:
             try:
                 aulas_queryset = Aula.objects.filter(professor=request.user.professor_profile)
+                professor = request.user.professor_profile
+                aulas_do_professor = Aula.objects.filter(professor=professor).select_related('aluno')
+                alunos_do_professor = Aluno.objects.filter(id__in=aulas_do_professor.values_list('aluno__id', flat=True)).distinct()
+                lista_de_alunos_para_filtro = alunos_do_professor
             except Professor.DoesNotExist:
                 messages.error(request, "Perfil de professor não encontrado.")
                 aulas_queryset = Aula.objects.none()
+                lista_de_alunos_para_filtro = Aluno.objects.none()
         elif user_is_responsavel_profile:
             responsavel_instances = request.user.responsavel_profiles.all()
             aulas_queryset = Aula.objects.filter(
@@ -140,8 +150,11 @@ def home(request):
                 aulas_queryset = aulas_queryset.filter(aluno__id=aluno_id)
             except ValueError:
                 messages.error(request, "ID de aluno inválido para filtro.")
+          
+        if user_is_responsavel_profile:
+            responsaveis = request.user.responsavel_profiles.all()
+            alunos_responsavel = Aluno.objects.filter(responsavel__in=responsaveis).order_by('nome')
 
-    
         # NOVO: Filtro por Professor
         if professor_id_str:
             if user_is_gestor_profile: # Apenas gestores podem filtrar por qualquer professor
@@ -254,6 +267,8 @@ def home(request):
         'horas_contratadas_aluno_filtrado': horas_contratadas_aluno_filtrado,
         'horas_utilizadas_aluno_filtrado': horas_utilizadas_aluno_filtrado,
         'saldo_horas_aluno_filtrado': saldo_horas_aluno_filtrado,
+        'user_is_responsavel_profile': user_is_responsavel_profile,
+        'alunos_responsavel': alunos_responsavel,
         }
     return render(request, 'home.html', context)
     

@@ -22,19 +22,32 @@
                 
             {% elif user_is_responsavel_profile %} 
                 
-                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 sm:mb-0">
-                    Horas Contratadas: <span class="text-blue-600 dark:text-blue-400">{{ horas_contratadas_aluno_filtrado|format_hours_minutes  }}</span>
+                <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                    Total Aulas<br> Contratadas<br> <span class="text-blue-600 dark:text-blue-400 text-2xl">{{ horas_contratadas_aluno_filtrado|format_hours_minutes  }}</span>
                 </h4>
 
-                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-2 sm:mb-0">
-                    Horas Utilizadas: <span class="text-orange-500 dark:text-orange-400">{{ horas_utilizadas_aluno_filtrado|format_hours_minutes }}</span>
+
+
+                <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
+                    Horas<br> Utilizadas<br> <span class="text-blue-600 dark:text-orange-400 text-2xl">{{ horas_utilizadas_aluno_filtrado|format_hours_minutes }}</span>
                 </h4>
-                <h4 class="text-lg font-semibold text-gray-700 dark:text-gray-200">
-                    Saldo de Horas: 
-                    <span id="saldoHorasResponsavel" 
-                            class="font-bold {% if saldo_horas_responsavel < 0 %}text-red-600 dark:text-red-400{% else %}text-green-600 dark:text-green-400{% endif %}">
+                <h4 class="p-4 rounded-lg shadow font-bold text-xl
+                    {% if saldo_horas_aluno_filtrado <= 0 %}
+                        bg-red-500 dark:bg-red-800
+                    {% elif saldo_horas_aluno_filtrado <= 10 %}
+                        bg-yellow-200 dark:bg-yellow-800
+                    {% else %}
+                        bg-green-200 dark:bg-green-800
+                    {% endif %}
+                    ">
+                    Saldo<br> Horas-Aula <br> 
+                    <span class="text-stone-900 dark:text-stone-400">
                             {{ saldo_horas_aluno_filtrado|format_hours_minutes }}
-                    </span>
+                    </span><br>
+                    {% if saldo_horas_aluno_filtrado < 0 %}
+                    <span class="font-bold text-xl text-stone-900 dark:text-red-200">Solicite <br> um pacote</span>
+
+                    {% endif %}
                 </h4>
             
             {% elif user_is_gestor %}
@@ -63,34 +76,7 @@
                         {{ saldo_horas_aluno_filtrado|format_hours_minutes }}
                     </span>
                     </h4>
-            {%else%}
-            
-                    <h4 class="p-4 rounded-lg shadow bg-gray-300 dark:bg-gray-100 text-black font-bold text-xl">
-                        Aulas <br> Contratadas <br> {{ total_contratado_responsavel|format_hours_minutes  }}
-                    </h4>
 
-                    <h4 class="p-4 rounded-lg shadow bg-green-300 dark:bg-red-500 text-black font-bold text-xl mt-0">
-                        Aulas <br> Realizadas <br> {{ total_utilizado_responsavel|format_hours_minutes }}
-                    </h4>
-                    <h4 class="p-4 rounded-lg shadow font-bold text-xl
-                    {% if saldo_horas_responsavel <= 0 %}
-                        bg-red-500 dark:bg-red-800
-                    
-                    {% elif saldo_horas_responsavel <= 10 %}
-                        bg-yellow-200 dark:bg-yellow-800
-                    {% else %}
-                        font-bold bg-blue-400 dark:bg-blue-800
-                    {% endif %}
-                    ">
-                     {% if saldo_horas_responsavel < 0 %}
-                    <span class="font-bold text-xl text-stone-900 dark:text-red-200">Solicite <br> um pacote</span>
-                    {% else %}
-                        Saldo<br> Horas-Aula <br> 
-                        <span class="font-semibold text-stone-900 dark:text-stone-500">
-                         {{ saldo_horas_responsavel|format_hours_minutes }}
-                        </span>
-                    {% endif %}
-                        </h4>
                     {% endif %}
         </div>
 
@@ -121,11 +107,11 @@
                 </select>
             </div>
             {% endif %}
-           {% if user_is_gestor or user_is_professor or user_is_responsavel_profile %}
+           {% if user_is_gestor%}
     <div>
         <label for="aluno" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno:</label>
         <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-            <option value="">Todos os alunos</option>
+            <option value="">Alunos(as)</option>
             {% for aluno in todos_alunos %}
                 <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
                     {{ aluno.nome }}
@@ -133,10 +119,45 @@
             {% endfor %}
         </select>
     </div>
-{% endif %}
- 
-        </div>
-        <div class="text-center mt-2">
+    {% endif %}
+
+
+    {%if user_is_professor%}
+    <div>
+        <label for="aluno" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno:</label>
+        <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Alunos(as)</option>
+            {% for aluno in todos_alunos %}
+            <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
+                {{ aluno.nome }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+    {%endif%}
+
+
+    {%if user_is_responsavel_profile%}
+    <div>
+        <label for="aluno" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Aluno(a):</label>
+        <select id="aluno" name="aluno" class="form-input-custom w-full bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-50 border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+            <option value="">Alunos(as)</option>
+            {% for aluno in alunos_responsavel %}
+                <option value="{{ aluno.id }}" {% if aluno.id|stringformat:"s" == selected_aluno %}selected{% endif %}>
+                    {{ aluno.nome }}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    
+
+    {% endif %}
+    
+    </div>
+        {%if user_is_responsavel_profile%}
+       <div class="text-center mt-2 bg-yellow-100 font-bold p-3 rounded text-xl text-black  mx-auto">Para visualizar as horas contratadas, realizadas e o saldo, selecione um(a) aluno(a) no filtro.</div> 
+        {%endif%}
+       <div class="text-center mt-2">
             <!-- Botão de Filtrar -->
             <button type="submit" class="btn btn-primary me-2">Filtrar Aulas</button>
 
@@ -157,8 +178,8 @@
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Data</th>
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Início</th>
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Término</th>
-                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Aluno</th>
-                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Professor</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Aluno(a)</th>
+                        <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Professor(a)</th>
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Duração</th>
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Status</th>
                         <th class="px-0 py-1 text-center text-xs font-medium text-gray-900 dark:text-gray-50 uppercase tracking-wider">Ações</th>

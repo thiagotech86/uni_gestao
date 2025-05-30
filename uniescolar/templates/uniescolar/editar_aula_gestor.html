@@ -33,7 +33,7 @@
                         {% if field.name == 'professor' and not is_gestor %}
                              {{ field.as_hidden }} 
                              {% if aula.professor %}
-                                <p class="form-input-custom bg-gray-100 dark:bg-gray-600 cursor-not-allowed p-3 rounded-md">Professor: {{ aula.professor }}</p>
+                                <p class="form-input-custom bg-gray-100 dark:bg-gray-600 cursor-not-allowed p-3 rounded-md">Professor(a): {{ aula.professor }}</p>
                              {% endif %}
                         {% else %}
                             {{ field }} 
