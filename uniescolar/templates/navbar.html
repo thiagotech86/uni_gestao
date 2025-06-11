@@ -23,7 +23,12 @@
                 {% if user.is_authenticated %}
                     {% if can_add_aula_permission %}
                         
-                        <a href="{% url 'add_aula' %}" class="p-4 rounded-lg  font-bold text-xl">Cadastrar Aula</a>
+                    <a href="{% url 'add_aula' %}" class="p-4 rounded-lg  font-bold text-xl">Cadastrar Aula</a>
+                    {% endif %}
+
+                    {% if can_add_aula_permission and user_is_gestor %}
+                        
+                    <a href="{% url 'admin:index' %}" class="p-4 rounded-lg  font-bold text-xl">Admin</a>
                     {% endif %}
                     <a href="{% url 'logout' %}" class=" p-4 rounded-lg  font-bold text-xl">Logout</a>
                 {% else %}
