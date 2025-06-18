@@ -33,6 +33,7 @@ SECRET_KEY = 'django-insecure-u#+$(dpfkvo18d3m3*zbnr1ev7wt#hn1er!9eulj9b74myupdz
 DEBUG = True
 
 ALLOWED_HOSTS = ['uni-gestao-qy2b.onrender.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['gestaouni.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition
