@@ -81,7 +81,7 @@
         </div>
 
         
-        {% if aulas %}
+        {% if aulas or not aulas %}
         <form method="GET" action="{% url 'home' %}" class="mt-0">
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-2 bg-gray-100 dark:bg-gray-800 rounded-lg shadow" style="padding: 0%";>
             <div>
@@ -261,9 +261,7 @@
                         <tr>
                             <td colspan="9" class="px-6 py-4 whitespace-nowrap text-sm text-gray-700 dark:text-gray-300 text-center">Nenhuma aula encontrada.</td>
                         </div>
-                        <div class="d-flex justify-content-center" style="margin: 0%;">
-                        <a href="{% url 'home' %}" class="btn btn-secondary">Limpar Filtros</a>
-                        </div>
+
                         </tr>
                     {% endif %}
                 </tbody>
