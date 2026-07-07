@@ -35,21 +35,12 @@ class Responsavel(models.Model):
     profissao = models.CharField(max_length=255)
 
     def __str__(self):
-# 1) Nome do responsável
         if self.user:
-            nome_resp = f"{self.user.first_name} {self.user.last_name}".strip() or self.user.username
-        else:
-            nome_resp = "Responsável sem usuário"
-
-        # 2) Nomes dos alunos dependentes
-        alunos = self.alunos_dependentes.all()          # usa o related_name
-        if alunos.exists():
-            nomes_alunos = ", ".join(aluno.nome for aluno in alunos)
-        else:
-            nomes_alunos = "Sem alunos vinculados"
-
-        # 3) String final
-        return f"{nome_resp} – Aluno(s): {nomes_alunos}"
+            return (
+            f"{self.user.first_name} {self.user.last_name}".strip()
+            or self.user.username
+        )
+        return "Responsável sem usuário"
 
 
 class Professor(models.Model):
